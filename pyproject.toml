@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "python-fasthtml>=0.6.4",
-    "requests>=2.32.3",
+    "requests==2.25.1",
+    "supabase-py",
     "toml>=0.10.2",
 ]

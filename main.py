@@ -6,8 +6,7 @@ import os # get environment variables
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
-
+from supabase import create_client, Client
 
 #ionos smtp password
 password = os.environ.get('EMAIL_PASSWORD')
