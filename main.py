@@ -2,16 +2,15 @@ from fasthtml.common import *
 from dataclasses import dataclass
 import re  # For email validation
 from datetime import datetime  # For getting the current date and time
-import toml #to access screts.toml file for passwords
+import os # get environment variables
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-#load config
-config = toml.load("secrets.toml")
+
 
 #ionos smtp password
-password = config['secrets']['ionos_password']
+password = os.environ.get('EMAIL_PASSWORD')
 
 today = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
