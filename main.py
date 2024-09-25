@@ -40,7 +40,7 @@ def send_email(data: dict):
     msg['From'] = 'admin@samcresearchforum.org'
     msg['To'] = data['email']
     msg['Subject'] = 'Scholarly Activity Submission'
-    body = f"Dear {data['full_name'].title()}, <br>Your submission for {data['research_type']} with the following description:<br>Submit Date: {today}<br>Department: {data['dept']}<br>Description: {data['description']}<br>Submit to Research Forum: {data['post_forum'] == 'on'}<br>Thank you for your submission. Please let us know if you have any questions. <br>Sincerely,<br>SAMC Research Committee"
+    body = f"Dear {data['full_name'].title()}, \nYour submission for {data['research_type']} with the following description:\n\nSubmit Date: {today}\nDepartment: {data['dept']}\nDescription: {data['description']}\nSubmit to Research Forum: {data['post_forum'] == 'on'}\n\nThank you for your submission. Please let us know if you have any questions. \nSincerely,\nSAMC Research Committee"
     msg.attach(MIMEText(body, 'plain'))
 
     # Prepare email recipients
@@ -192,7 +192,8 @@ async def post(req):
             submitted_data = response.data[0]  # Since it's a list with one item, we access the first element
 
             # Form submission successful
-            send_email(submission)  # Send email to the user and static email address
+            send_email({"full_name": form_data["full_name"], "title": form_data["title"], "dept": form_data["dept"], "research_type": form_data["research_type"], "email": form_data["email"], "description": form_data["description"], "post_forum": "post_forum" in form_data})   
+             # Send email to the user and static email address
             return Titled("Form Submitted", 
                 P("Your form has been successfully submitted!"),
                 Ul(*[
