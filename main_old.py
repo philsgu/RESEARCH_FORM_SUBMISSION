@@ -8,24 +8,19 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from supabase import create_client, Client
 
-# Supabase configuration
-SUPABASE_URL = os.environ.get("SUPABASE_URL_RC")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY_RC")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
 #ionos smtp password
 password = os.environ.get('EMAIL_PASSWORD')
 
 today = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
-# Initialize the FastHTML app
+# Initialize the FastHTML app and SQLite database
 app, rt = fast_app(
     hdrs=(Style("""
         .error {
             border: 2px solid red;
         }
     """),
-    Link(rel="icon", type="image/x-icon", href="assets/favicon.ico"), # Updated path
+    Link(rel="icon", type="image/x-icon", href="assets/favicon.ico"),  # Updated path
     Link(rel="icon", type="image/png", sizes="32x32", href="assets/favicon-32x32.png"),
     Link(rel="icon", type="image/png", sizes="16x16", href="assets/favicon-16x16.png"),
     Link(rel="apple-touch-icon", sizes="180x180", href="assets/apple-touch-icon.png"),
@@ -33,6 +28,7 @@ app, rt = fast_app(
     Link(rel="icon", sizes="512x512", href="assets/android-chrome-512x512.png")
     )
 )
+db = Database("submissions.db")
 
 # Email sending function
 def send_email(data: dict):
@@ -40,10 +36,10 @@ def send_email(data: dict):
     msg['From'] = 'admin@samcresearchforum.org'
     msg['To'] = data['email']
     msg['Subject'] = 'Scholarly Activity Submission'
-    body = f"Dear {data['full_name'].title()}, <br>Your submission for {data['research_type']} with the following description:<br>Submit Date: {today}<br>Department: {data['dept']}<br>Description: {data['description']}<br>Submit to Research Forum: {data['post_forum'] == 'on'}<br>Thank you for your submission. Please let us know if you have any questions. <br>Sincerely,<br>SAMC Research Committee"
+    body = f"Dear {data['full_name'].title()}, \n\nYour submission for {data['research_type']} with the following description:\n\nSubmit Date: {today}\nDepartment: {data['dept']}\nDescription: {data['description']}\nSubmit to Research Forum: {data['post_forum'] == 'on'}\n\nThank you for your submission. Please let us know if you have any questions. \n\nSincerely,\nSAMC Research Committee"
     msg.attach(MIMEText(body, 'plain'))
 
-    # Prepare email recipients
+    # Prepare email receipents
     recipients = [data['email']]+['phillip.kim@samc.com']
 
     # Send the email
@@ -54,10 +50,11 @@ def send_email(data: dict):
     server.sendmail('admin@samcresearchforum.org', recipients, text)
     server.quit()
 
+
 @dataclass
 class FormSubmission:
-    id: int  # auto incremented
-    #date: str
+    id: int #auto incremented
+    date: str
     full_name: str
     title: str
     dept: str
@@ -65,6 +62,9 @@ class FormSubmission:
     email: str
     description: str
     post_forum: bool = False  # Default to False since it's optional
+
+# Create a table in SQLite
+submissions_table = db.create(FormSubmission, pk="id")
 
 # Define a helper function to validate email
 def is_valid_email(email):
@@ -172,49 +172,26 @@ async def post(req):
             )
         )
     else:
-        # Save form data to Supabase
-        submission = {
-            "full_name": form_data["full_name"],
-            "title": form_data["title"],
-            "dept": form_data["dept"],
-            "research_type": form_data["research_type"],
-            "email": form_data["email"],
-            "description": form_data["description"],
-            "post_forum": "post_forum" in form_data  # Handle checkbox being optional
-        }
-        
-       # Insert data into Supabase
-        response = supabase.table("researchform").insert(submission).execute()
+        # Save form data to the database (post_forum is optional and defaults to False)
+        submission = FormSubmission(
+            date=today,
+            full_name=form_data["full_name"],
+            title=form_data["title"],
+            dept=form_data["dept"],
+            research_type=form_data["research_type"],
+            email=form_data["email"],
+            description=form_data["description"],
+            post_forum=form_data.get("post_forum", False)  # Handle checkbox being optional
+        )
+        submissions_table.insert(submission)
+        # Send email to the user and static email address
+        send_email({"full_name": form_data["full_name"], "title": form_data["title"], "dept": form_data["dept"], "research_type": form_data["research_type"], "email": form_data["email"], "description": form_data["description"], "post_forum": form_data.get("post_forum", False)})   
 
-        # Handle response
-        if response.data:
-            # Extract the submitted data
-            submitted_data = response.data[0]  # Since it's a list with one item, we access the first element
-
-            # Form submission successful
-            send_email(submission)  # Send email to the user and static email address
-            return Titled("Form Submitted", 
-                P("Your form has been successfully submitted!"),
-                Ul(*[
-                    Li(f"Submitted ID: {submitted_data['id']}"),
-                    Li(f"Full Name: {submitted_data['full_name']}"),
-                    Li(f"Title: {submitted_data['title']}"),
-                    Li(f"Department: {submitted_data['dept']}"),
-                    Li(f"Research Type: {submitted_data['research_type']}"),
-                    Li(f"Email: {submitted_data['email']}"),
-                    Li(f"Description: {submitted_data['description']}"),
-                    Li(f"Post Forum: {'Yes' if submitted_data['post_forum'] else 'No'}"),
-                    Li(f"Created At: {submitted_data['created_at']}")
-                    ]),
-    
-                A(href="/")("Submit another form")
-            )
-        else:
-            #print("Error inserting data:", response.error_message)
-            return Titled("Error", 
-                P("An error occurred while submitting the form. Please try again later."),
-                P(f"Error Details: {response.error_message}")
-            )
+        # Show confirmation and link to submit another form
+        return Titled("Form Submitted", 
+            P("Your form has been successfully submitted!"),
+            A(href="/")("Submit another form")
+        )
 
 # Run the server
 serve()
