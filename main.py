@@ -11,7 +11,7 @@ from supabase import create_client, Client
 # Supabase configuration
 SUPABASE_URL = os.environ.get("SUPABASE_URL_RC")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY_RC")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 #ionos smtp password
 password = os.environ.get('EMAIL_PASSWORD')
