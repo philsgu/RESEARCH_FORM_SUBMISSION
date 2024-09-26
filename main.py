@@ -16,6 +16,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 #ionos smtp password
 password = os.environ.get('EMAIL_PASSWORD')
 
+
 today = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
 # Initialize the FastHTML app
@@ -192,7 +193,7 @@ async def post(req):
             submitted_data = response.data[0]  # Since it's a list with one item, we access the first element
 
             # Form submission successful
-            send_email({"full_name": form_data["full_name"], "title": form_data["title"], "dept": form_data["dept"], "research_type": form_data["research_type"], "email": form_data["email"], "description": form_data["description"], "post_forum": "post_forum" in form_data})   
+            # send_email({"full_name": form_data["full_name"], "title": form_data["title"], "dept": form_data["dept"], "research_type": form_data["research_type"], "email": form_data["email"], "description": form_data["description"], "post_forum": "post_forum" in form_data})   
              # Send email to the user and static email address
             return Titled("Form Submitted", 
                 P("Your form has been successfully submitted!"),
