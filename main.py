@@ -3,9 +3,9 @@ from dataclasses import dataclass
 import re  # For email validation
 from datetime import datetime  # For getting the current date and time
 import os # get environment variables
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+# import smtplib
+# from email.mime.text import MIMEText
+# from email.mime.multipart import MIMEMultipart
 from supabase import create_client, Client
 
 # Supabase configuration
@@ -14,7 +14,7 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY_RC")
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 #ionos smtp password
-password = os.environ.get('EMAIL_PASSWORD')
+# password = os.environ.get('EMAIL_PASSWORD')
 
 
 today = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
@@ -36,24 +36,24 @@ app, rt = fast_app(
 )
 
 # Email sending function
-def send_email(data: dict):
-    msg = MIMEMultipart()
-    msg['From'] = 'admin@samcresearchforum.org'
-    msg['To'] = data['email']
-    msg['Subject'] = 'Scholarly Activity Submission'
-    body = f"Dear {data['full_name'].title()}, \nYour submission for {data['research_type']} with the following description:\n\nSubmit Date: {today}\nDepartment: {data['dept']}\nDescription: {data['description']}\nSubmit to Research Forum: {data['post_forum'] == 'on'}\n\nThank you for your submission. Please let us know if you have any questions. \nSincerely,\nSAMC Research Committee"
-    msg.attach(MIMEText(body, 'plain'))
+# def send_email(data: dict):
+#     msg = MIMEMultipart()
+#     msg['From'] = 'admin@samcresearchforum.org'
+#     msg['To'] = data['email']
+#     msg['Subject'] = 'Scholarly Activity Submission'
+#     body = f"Dear {data['full_name'].title()}, \nYour submission for {data['research_type']} with the following description:\n\nSubmit Date: {today}\nDepartment: {data['dept']}\nDescription: {data['description']}\nSubmit to Research Forum: {data['post_forum'] == 'on'}\n\nThank you for your submission. Please let us know if you have any questions. \nSincerely,\nSAMC Research Committee"
+#     msg.attach(MIMEText(body, 'plain'))
 
-    # Prepare email recipients
-    recipients = [data['email']]+['phillip.kim@samc.com']
+#     # Prepare email recipients
+#     recipients = [data['email']]+['phillip.kim@samc.com']
 
-    # Send the email
-    server = smtplib.SMTP('smtp.ionos.com', 587)
-    server.starttls()
-    server.login('admin@samcresearchforum.org', password)
-    text = msg.as_string()
-    server.sendmail('admin@samcresearchforum.org', recipients, text)
-    server.quit()
+#     # Send the email
+#     server = smtplib.SMTP('smtp.ionos.com', 587)
+#     server.starttls()
+#     server.login('admin@samcresearchforum.org', password)
+#     text = msg.as_string()
+#     server.sendmail('admin@samcresearchforum.org', recipients, text)
+#     server.quit()
 
 @dataclass
 class FormSubmission:
