@@ -81,7 +81,7 @@ def form_view():
                 Label("Full Name", Input(type="text", name="full_name", required=True, placeholder="Enter your full name")),
                 Label("Select Your Title", 
                       Select(name="title", required=True)(
-                          Option(value="")("Select Your Title", Selected=False),
+                          Option(value="", disabled=True, selected=True)("Select Your Title"),
                           Option(value="Faculty")("Faculty"),
                           Option(value="Resident")("Resident"),
                           Option(value="Student")("Student"),
@@ -90,7 +90,7 @@ def form_view():
                       )),
                 Label("Department", 
                        Select(name="dept", required=True)(
-                            Option(value="")("Select Your Department", Selected=False),
+                            Option(value="", disabled=True, selected=True)("Select Your Department"),
                             Option(value="Emergency Medicine")("Emergency Medicine"),
                             Option(value="Family Medicine")("Family Medicine"),
                             Option(value="Internal Medicine")("Internal Medicine"),
@@ -100,7 +100,7 @@ def form_view():
                         )),
                 Label("Research Type",
                     Select(name="research_type", required=True)(
-                        Option(value="")("Select Research Type", Selected=False),
+                        Option(value="", disabled=True, selected=True)("Select Research Type"),
                         Option(value="Abstract for Conferences")("Abstract for Conferences"),
                         Option(value="Case Reports")("Case Reports"),
                         Option(value="Prosepective Studies")("Prosepective Studies"),
