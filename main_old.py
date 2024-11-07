@@ -108,6 +108,7 @@ def form_view():
                         Option(value="Other")("Other"),
                     )),
                 Label("Email", Input(type="email", name="email", required=True, placeholder="Enter your email")),
+                Label("Title", input(type="text", name="title", required=False, placeholder="Please provide a working project title if there's one (optional)"),
                 Label("Description", Textarea(name="description", required=True, placeholder="Provide a brief description")),
                 Label(Input(type="checkbox", name="post_forum"), "Post to SAMC Research Forum")  # Optional checkbox
             ),
