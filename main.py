@@ -72,14 +72,22 @@ def is_valid_email(email):
     # Simple email validation (can be enhanced with more robust regex)
     return re.match(r"[^@]+@[^@]+\.[^@]+", email)
 
+#create a required label asterik
+def required_label(text):
+    return Label(
+        text, 
+        Span("*", style="color: red;")
+    )
+
+
 # Define the form page
 @rt("/")
 def form_view():
     return Titled("SAMC Scholarly Activity Submission Form", 
         Form(method="post", action="/submit")(
             Fieldset(
-                Label("Full Name", Input(type="text", name="full_name", required=True, placeholder="Enter your full name")),
-                Label("Select Your Title", 
+                Label(required_label("Full Name"), Input(type="text", name="full_name", required=True, placeholder="Enter your full name")),
+                Label(required_label("Select Your Title"), 
                       Select(name="title", required=True)(
                           Option(value="", disabled=True, selected=True)("Select Your Title"),
                           Option(value="Faculty")("Faculty"),
@@ -88,7 +96,7 @@ def form_view():
                           Option(value="Staff")("Staff"),
                           Option(value="Other")("Other"),
                       )),
-                Label("Department", 
+                Label(required_label("Department"), 
                        Select(name="dept", required=True)(
                             Option(value="", disabled=True, selected=True)("Select Your Department"),
                             Option(value="Emergency Medicine")("Emergency Medicine"),
@@ -98,7 +106,7 @@ def form_view():
                             Option(value="Surgery")("Surgery"),
                             Option(value="Other")("Other"),
                         )),
-                Label("Research Type",
+                Label(required_label("Research Type"),
                     Select(name="research_type", required=True)(
                         Option(value="", disabled=True, selected=True)("Select Research Type"),
                         Option(value="Abstract for Conferences")("Abstract for Conferences"),
@@ -108,10 +116,13 @@ def form_view():
                         Option(value="QI/PI")("QI/PI"),
                         Option(value="Other")("Other"),
                     )),
-                Label("Email", Input(type="email", name="email", required=True, placeholder="Enter your email")),
+                Label(required_label("Email"), Input(type="email", name="email", required=True, placeholder="Enter your email")),
                 Label("Project Title", Input(type="text", name="title_proj", required=False, placeholder="Optional Working Research Project Title")),
-                Label("Description", Textarea(name="description", required=True, placeholder="Provide a brief description")),
-                Label(Input(type="checkbox", name="post_forum"), "Post to SAMC Research Forum")  # Optional checkbox
+                Label(required_label("Description"), Textarea(name="description", required=True, placeholder="Provide a brief description")),
+                Label(Input(type="checkbox", name="post_forum"), "Post to SAMC Research Forum"),  # Optional checkbox
+                   
+                # Add the required notice at the bottom of the form
+                P("* Required", style="color: red; font-style: italic;")
             ),
             Button(type="submit")("Submit")
         )
